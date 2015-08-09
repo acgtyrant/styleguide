@@ -25,6 +25,12 @@
 * `open(path, O_CREAT | O_EXCL` vs `open()` 和 `creat`.
 * `dup2(fd, fd2)` vs `close(fd2); fcntl(fd, F_DUPFD, fd2)`
 
+## 避免缓存区溢出
+
+* `gets()` vs `fgets()`
+* `puts()` vs `fputs()`, 虽然这输出函数并不会引起缓存区溢出，但鉴于 `puts()` 会额外添加换行符，又和 `puts()` 成一对，干脆无视掉它的存在吧。
+* `sprintf()` vs `snprintf()`
+
 ## 其它
 
 鉴于 `creat` 只能只写方式打开所创建的文件，于是一律用 `open(path, O_CREAT, mode)` 统一代替。
@@ -36,3 +42,9 @@
 在修改文件描述符标志或文件状态标志，先获取，再修改，最后设置。
 
 写入数据库文件，在 `open()`, 加上 `O_SYNC`. 或用 `fsync()` 强制更新。
+
+不要在宏里用表达式。`getc()`, `putc()` 就是宏。
+
+文件流「结束」时，要用上 `ferror()` 和 `feof()` 以判断是达到文件结尾还是出错。
+
+标准 I/O 并不比 POSIX I/O 慢，优先用。
