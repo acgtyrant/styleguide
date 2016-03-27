@@ -42,6 +42,8 @@ http://www.zkt.name/c-s-most-vexing-parse/ 研究下用列表初始化全面代�
 
 研究利于分支预测优化的编程风格。
 
+优先用 `at` 代替 `operator[]`. 前者有边界检查；此外 `std::map::at` 不会违背 const 属性，后者则反。
+
 ## Google Guide Style 笔记
 
 右值引用：居然只提倡用在移动构造函数和移动赋值操作，似乎忽略了完美转发问题？
@@ -73,6 +75,8 @@ http://www.zkt.name/c-s-most-vexing-parse/ 研究下用列表初始化全面代�
 别在派生类重用名字吧？ 
 
 通过把复制构造函数放到 `private` 区段以禁用的作法过时了，请用 C++11 特性 `delete`.
+
+用库函数的返回值做除法时，注意返回值的类型，比如 cv::Rect::area() 的 类型就为 int, 计算矩形的重叠面积就会失足。
 
 # Effective C++
 
