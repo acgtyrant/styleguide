@@ -1,22 +1,30 @@
+## 库
+
 用 `subprocess.call` 代替 `os.system` 执行外部命令。
 
-习惯用 `args` 和 `kwargs` 来充当函数的捕获参数。
+[用 `pathlib` 解析 Path](http://tech.acgtyrant.com/御用-Path-规范/), 除非要用 `os.path` 解析 str 对象。
+
+`collections.namedtuple` 可以构造 named tuple 对象。
+
+用 `typing` 来提供高级的 type hints, 比如 Tuple 和 Mapping 等。
+
+[用 `logging` 代替 print 调试](http://victorlin.me/posts/2012/08/26/good-logging-practice-in-python)。
+
+靠 `json.dumps(data, indent=2)` 来得到可读性好的 json.
+
+## 其他
 
 始终要对字符串是否包含换行符而胸有成竹。
 
-`_` 用来接收我们不需要关心的变量，禁止赋值之外的任何行为！此外，其实同一条赋值语句可以反复使用 `_`: `_, _ = 1, 2`.
+`_` 用来接收我们不需要关心的变量，禁止赋值之外的任何行为！此外，其实同一条赋值语句可以反复使用： `_`: `_, _ = 1, 2`.
 
-有待规范 Python 中异常与 option 之间的关系。
+TODO: 有待规范 Python 中异常与 option 之间的关系。
 
-当在 if 表达式判断对象 `_` 是否为 None 时，不要用 `if not _`, 而是 `if _ is None`.
+当在 if 表达式判断两个对象是否相等，用 `if _1 == _2` 即可；当判断两个对象是否同一个，用 `if _1 is _2`. 当判断对象 `_` 是否为 None 时，不要用 `if not _`, 而是 `if _ is None`.
 
-当在 if 表达式判断两个对象是否相等，用 `if _1 == _2` 即可；当判断两个对象是否同一个，用 `if _1 is _2`.
+[Python天坑系列（一）：while 1比while True更快？](http://www.pythoner.com/356.html)简而言之，用 Python 3 啦！
 
-http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待吸纳自动化工具。
-
-map vs list comprehension: 若要可读性，用后者；若要效率，用后者；若要 lazy, 用前者；若要函数式编程，用前者。
-
-不光列表推导，我们也可以习惯于集合推导和字典推导。
+TODO: http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待吸纳自动化工具。
 
 熟练地交换变量：`a, b = b, a`.
 
@@ -30,7 +38,7 @@ map vs list comprehension: 若要可读性，用后者；若要效率，用后�
 
 要么改用 Pythpn 标准库，要么写名字与前者不冲突的新模块。
 
-靠 `json.dumps(data, indent=2)` 来得到可读性好的 json.
+[传入模块名用 `fullename`](https://laike9m.com/blog/useful-hacklazy-module-attribute,68/).
 
 ## [用 __all__ 暴露接口](https://python-china.org/t/725)
 
@@ -87,17 +95,17 @@ dct[key] = dct.get(key, 0) + 1
 
 #### 第一条
 
-休闲开发不用 Python 2, 即只用 Arch Linux 上最新的 Python 3; 默认实现用 CPython, 与 C/C++ 交互时考虑用 Cython.
+休闲开发不用 Python 2, 即只用 Arch Linux 上最新的 Python 3; 默认实现用 CPython, 与 C/C++ 交互时考虑用 Cython; 也许可以用 docker 管理虚拟环境。
 
 #### 第二条
 
 遵循 PEP 8. Google Python Style 无关紧要，除非作为员工而为 Google 效力。
 
-有待总结 PEP 8.
+TODO: 有待总结 PEP 8.
 
 #### 第三条
 
-[Python-语法、进程和文件之间的编码关系](http://tech.acgtyrant.com/Python-语法、进程和文件之间的编码关系/_
+[Python-语法、进程和文件之间的编码关系](http://tech.acgtyrant.com/Python-语法、进程和文件之间的编码关系/)
 
 #### 第四条
 
@@ -113,7 +121,7 @@ dct[key] = dct.get(key, 0) + 1
 
 #### 第七条
 
-用列表推导代替需要额外 lambda 的 `map`. 用支持 if 语句的列表推导代替 `map` 与 `filter.`
+用列表推导代替需要额外 lambda 的 `map`. 用支持 if 语句的列表推导代替 `map` 与 `filter.`; 不光列表推导，我们也可以习惯于集合推导和字典推导；不过[ map 有时比 list comprehension 好](http://tech.acgtyrant.com/什么情况下-map-比-list-comprehension-好？/)
 
 #### 第八条
 
@@ -129,7 +137,7 @@ dct[key] = dct.get(key, 0) + 1
 
 #### 第十一条
 
-用 `zip` 平行地迭代两个列表；Python 2 用 `itertools.izip` 作为生成器表达式；确保两个迭代起长度相等！
+**用 `zip` 平行地迭代两个列表**；Python 2 用 `itertools.izip` 作为生成器表达式；确保两个迭代起长度相等！
 
 #### 第十二条
 
@@ -141,7 +149,7 @@ dct[key] = dct.get(key, 0) + 1
 
 #### 第十四条
 
-当调用者违背了函数调用的约定。要么采用人造的 option type 手法（因为目前 Python 没有支持 maybe monad 的语法或官方库（大概？），我们只能如此返回一个二元组，第一个元素标识操作是否成功，第二个元素则是运算结果值）；要么干脆扔回异常。后者的措辞更为激烈。
+当调用者违背了函数调用的约定。要么采用人造的 option type 手法（因为目前 Python 没有支持 maybe monad 的语法或官方库（大概？），我们只能如此返回一args个二元组，第一个元素标识操作是否成功，第二个元素则是运算结果值）；要么干脆扔回异常。后者的措辞更为激烈。
 
 #### 第十五条
 
