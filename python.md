@@ -4,19 +4,19 @@
 
 [用 `pathlib` 解析 Path](http://tech.acgtyrant.com/御用-Path-规范/), 除非要用 `os.path` 解析 str 对象。
 
-`collections.namedtuple` 可以构造 named tuple 对象。
-
 用 `typing` 来提供高级的 type hints, 比如 Tuple 和 Mapping 等。
 
 [用 `logging` 代替 print 调试](http://victorlin.me/posts/2012/08/26/good-logging-practice-in-python)。
 
 靠 `json.dumps(data, indent=2)` 来得到可读性好的 json.
 
+可以用 `funtools.total_ordering` 简化编写所有比较魔法方法的工作，除非变成瓶颈。
+
+[加入马戏团，刷魔术方法](http://www.rafekettler.com/magicmethods.html)
+
 ## 其他
 
 始终要对字符串是否包含换行符而胸有成竹。
-
-`_` 用来接收我们不需要关心的变量，禁止赋值之外的任何行为！此外，其实同一条赋值语句可以反复使用： `_`: `_, _ = 1, 2`.
 
 TODO: 有待规范 Python 中异常与 option 之间的关系。
 
@@ -26,7 +26,7 @@ TODO: 有待规范 Python 中异常与 option 之间的关系。
 
 TODO: http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待吸纳自动化工具。
 
-熟练地交换变量：`a, b = b, a`.
+[如同蛇一般地赋值](http://blog.windrunner.info/python/assignment.html#python-中的赋值) ：交换变量：`a, b = b, a`.可以用 `_` 用来接收我们不需要关心的变量，当然禁止产生赋值之外的任何行为；其实同一条赋值语句可以反复还使用 `_`: `_, _ = 1, 2`. 再配合星号 unpacking, 用 `*_` 一口气抛弃掉其他多余的返回值： `a, *_ = some_str.split()`（黑魔法施展状
 
 直接链式比较 `0 < a < 2`，不再分拆成多个子比较表达式。
 
@@ -36,9 +36,11 @@ TODO: http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待�
 
 小心 lambda 的 late binding 行为。
 
-要么改用 Pythpn 标准库，要么写名字与前者不冲突的新模块。
+要么改用 Python 标准库，要么写名字与前者不冲突的新模块。
 
 [传入模块名用 `fullename`](https://laike9m.com/blog/useful-hacklazy-module-attribute,68/).
+
+有必要时可以用 try/else 代替 with; [try 可以包含 return 语句，finally 照样会在之后被执行](http://stackoverflow.com/questions/7442133/try-else-with-return-in-try-block/7442252#7442252)。
 
 ## [用 __all__ 暴露接口](https://python-china.org/t/725)
 
@@ -95,7 +97,7 @@ dct[key] = dct.get(key, 0) + 1
 
 #### 第一条
 
-休闲开发不用 Python 2, 即只用 Arch Linux 上最新的 Python 3; 默认实现用 CPython, 与 C/C++ 交互时考虑用 Cython; 必要时还可以试试传说效率更胜一筹的 PyPy; 也许可以用 docker 管理虚拟环境。
+休闲开发不用 Python 2, 即只用 Arch Linux 上最新的 Python 3; 默认实现用 CPython, 与 C/C++ 交互时考虑用 Cython, 高性能实现考虑用 PyPy; 也许可以用 docker 管理虚拟环境。
 
 #### 第二条
 
@@ -173,11 +175,25 @@ TODO: 有待总结 PEP 8.
 
 #### 第二十条
 
-**若要设置关键字参数为动态的默认值，则先指定默认值为 `None`, 然后再在函数内部动态地赋新值**；不要在形参用 `[]` 或 `{}` 之类的默认值。
+若要设置关键字参数为动态的默认值，则先指定默认值为 `None`, 然后再在函数内部动态地赋新值，必要时再在文档字符串说明其行为；不要在形参用 `[]` 或 `{}` 之类的默认值。
 
 #### 第二十一条
 
 若要强制调用者用关键字参数形式声明实参，可以通过 Python 3 的 `*` 语法或 Python 2 的 `**kwargs` 并手工抛 TypeError 手法实现。
+
+#### 第三十六条
+
+比起 popen, popen2, os.exec*, 优先用 subprocess 模块管理子进程和其 IO; 可以给 communicate 方法传入 timeout 参数以定 deadline.
+
+#### 第三十七条
+
+老生常谈的 GIL 之咒；所以多线程只适合加速 IO 密集计算。
+
+#### 第三十八条
+
+#### 第四十一条
+
+平行计算方案优先级递减：concurrent.future.ProcessPoolExecutor > concurrent.future.ThreadPoolExecutor > multiprocess > c module.
 
 #### 第四十二条
 
@@ -197,6 +213,8 @@ TODO: 有待总结 PEP 8.
 
 #### 第四十六条
 
+`collections.namedtuple` 可以构造 named tuple 对象；`collections.defaultdict` 可以构造默认值为类的字典，比如 `collections.defaultdict(list)`; 用 collections.deque 当双端队列，不要用 list; dict 是无序的，用 `collections.OrderedDict` 当有序字典；用 `heapq` 模块实现优先级队列；用  `bisect.bisect_left` 二分查找；妙用 `itertools` 模块，**详阅正文，此处略**。
+
 #### 第四十七条
 
 用 `decimal` 或 `fractions` 来高精度计算。前者的精度有限，后者无限。
@@ -207,9 +225,15 @@ TODO: 有待总结 PEP 8.
 
 #### 第四十九条
 
-精华篇幅不小，请详阅正文。此处略。
+精华篇幅不小，请**详阅正文，此处略**。
 
 #### 第五十条
+
+#### 第五十一条
+
+#### 第五十三条
+
+必要时，用 pyenv 隔离软件包的开发环境；靠 `pip freeze` 保存依赖关系到 `requirements.txt`; 
 
 ### 第八章
 
