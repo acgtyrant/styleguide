@@ -12,11 +12,21 @@
 
 可以用 `funtools.total_ordering` 简化编写所有比较魔法方法的工作，除非变成瓶颈。
 
+可以用 `functools.partial` 特化函数，以塞进函数接口。
+
 [加入马戏团，刷魔术方法](http://www.rafekettler.com/magicmethods.html)
+
+## 2to3
+
+`range`, `map`, `filter`, `reduce` 在 Python 3 里均是生成器返回的 iterator, 必要时要转换为 list; Python 2 里则是 list.
+
+Python 2 enconding: `# coding=utf-8`
+
+Python 2 必须同时定义 `__eq__` 和 `__ne__` 方法，Python 3 则只定义其中一个即可。
 
 ## 其他
 
-始终要对字符串是否包含换行符而胸有成竹。
+始终要对字符串是否包含换行符而胸有成竹。凡 identifier 是 `line`, 就必有回车符；分拆 line 或打印或 log 时，就要 `rstrip('\n')`; 同理，用 `format` 构造 `line` 时，就要在尾部显示加上回车符，除非最有一个参数是 `line`.
 
 TODO: 有待规范 Python 中异常与 option 之间的关系。
 
