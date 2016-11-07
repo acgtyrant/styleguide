@@ -48,6 +48,22 @@ http://www.zkt.name/c-s-most-vexing-parse/ 研究下用列表初始化全面代�
 
 在函数里，尽量不通过引用修改对象，而是返回对象以赋值回前者。除非用 malloc 开销大的 std::vector, 此外 const 形参要放在前面，非 const 形参在后。
 
+`T const *const a;`, `int const operator *() const;`.
+
+最佳重载实践：
+
+`T const *operator ->() { return &this->operator *(); }` , `T const operator ++(int) { T tmp(*this); this->operator ++(); return tmp; }`.
+
+C++ 应该能根据现成的 `operator *()` 和 `operator ++()` 自动合成以上。
+
+必要时，可以用 `std::back_inserter` 来辅助地复制一对迭代器范围内的值到另一个迭代器：
+```cpp
+assert(y.size() == 0);
+std::copy(x.begin(), x.end(), std::back_inserter(y));
+```
+
+函数返回值会构造一个临时对象，也就是说理论上可以被赋值，然而此行为无益，于是编译器规定若返回值并非是指针或引用，不是有效的左值，自然也不能被赋值。此外，当返回值是指针或引用，当然可以用 const.
+
 ## Google Guide Style 笔记
 
 右值引用：居然只提倡用在移动构造函数和移动赋值操作，似乎忽略了完美转发问题？
@@ -86,11 +102,11 @@ http://www.zkt.name/c-s-most-vexing-parse/ 研究下用列表初始化全面代�
 
 # Effective C++
 
-## 条款二
+## 条款三
 
-优先声明成 const 函数，非 const 函数就通过转型调用前者。
+当 const 和 non-const 成员函数实现等价时，优先定义前者，后者就通过 const_cast 地调用前者。
 
-函数返回值会构造一个临时对象，也就是说理论上可以被赋值，然而此行为无益，于是编译器规定若返回值并非是指针或引用，不是有效的左值，自然也不能被赋值。此外，当返回值是指针或引用，当然可以用 const.
+标准的 const 可能贯彻 bitwise const, 然而有必要时，我们也可以遵循 logical const, 于是可以用 mutable 重新修饰相关数据成员。
 
 ## 条款四
 
@@ -98,11 +114,11 @@ http://www.zkt.name/c-s-most-vexing-parse/ 研究下用列表初始化全面代�
 
 ## 条款五
 
-构造、复制、赋值、祈构都要显式声明，可以用 `default` 或 `delete` 来简化。
+为了搞清楚您到底想要什么样的类，构造、复制、移动、赋值、祈构统统都要显式声明，可以用 `default` 或 `delete` 来简化。
 
 ## 条款七
 
-明确祈构函数是否需要 `virtual` 参数。如果不加，意味着不能当 base class 用 STL 容器就是如此，此外，加了 `virtual` 参数会害得类占用额外的空间。
+明确类是否需要运行时多态。若需要，那么一定会有 virtual 成员函数，祈构函数相应地也要加 `virtual` 参数，以能够让派生类在运行时多态时能正确地把被析构。反之，就意味着不能当 base class 用了，STL 容器就是如此；此外，加 `virtual` 参数会额外占用空间。
 
 ## 条款八
 
@@ -112,35 +128,59 @@ http://www.zkt.name/c-s-most-vexing-parse/ 研究下用列表初始化全面代�
 
 ## 条款九
 
-不要在构造函数和析构函数调用虚函数，因为这类调用不会下降到 derivec class.
-
+不要在构造函数和析构函数调用虚函数，因为这类调用不会下降到 derivec class, 换言之构造函数和析构函数的内部不贯彻运行时多态。
+消费
 ## 条款十
 
 赋值操作符返回 reference to *this
 
 ## 条款十一
 
-赋值运算符应该能够处理自我赋值的情况。推广之，则确保任何操作一个以上对象的函数，能在所有参数都是同一个对象时，依然执行正确。
+赋值运算符应该能够处理自我赋值的情况，可以贯彻 copy and swap 惯用法。推广之，则确保任何操作一个以上对象的函数，能在所有参数都是同一个对象时，依然执行正确。
 
 ## 条款十二
 
-derived class 的 copying 函数要直接调用 base class 的 copying 函数。
+确保每增加新私有变量时，同步更新所有显式定义的拷贝控制函数。derived class 的 copying 函数要直接调用 base class 的 copying 函数。
 
 别试图用 copy 构造函数和赋值操作符中的一个函数代替另一个函数。
 
+## 条款十四
+
+妥当处理好 RAII 类的 copying 行为，可以 delete 或引用计数地共享。
+
+## 条款十五
+
+RAII 的初衷只有确保资源在脱离作用域时能被及时释放而已，对原始资源的访问并不违背封装原则，于是有必要时就提供后者，可以直接像 std::shared_ptr 一样提供 get 函数。
+
+## 条款十六
+
+new/delete 精确地同时使用或不使用 `[]`; 于是尽量避免 typedef 数组，否则后者带来 `new/delete []` 上的隐患。
+
+## 条款十七
+
+不要在形参里将 new 语句传给智能指针构造函数，因为有可能由于形参里的另一个函数调用发生异常中断而造成资源泄漏。
+
+## 条款十八
+
+精心设计好用的接口，可以靠类型系统强化鲁棒性、保持接口高度一致、与内置类型行为兼容、杜绝客户手动管理资源的负担等等。
+
+## 条款十九
+
+设计 class 如同设计新 type: 精确拷贝控制，规定合法值，设计继承图系，定义成员函数和操作符，封装，模板化，有无必要等等。
+
 ## 条款二十
 
-优先用 pass by reference to const 代替 pass by value. 一来可以避免对象切割问题，即 derived class 对象不会被 base class 的复制构造函数害得只有后者的成员传递进去；二来效率更高；
+优先用 pass by reference to const 代替 pass by value. 一来可以避免对象切割问题，即 derived class 对象不会被 base class 的复制构造函数害得只有前者变成了后者；二来效率更高；
 
-不过内置类型，STL 迭代器和函数对象只能用 pass by value, 毕竟 STL 容器本来不能被当成 base class 用。
+不过内置类型，STL 迭代器和函数对象只能用 pass by value.
 
 ## 条款二十一
 
-别返回指向 locak stack 的 pointer 和 reference, 或返回指向 heal-allocated 的 reference.
+考虑好你要返回引用还是对象；别返回指向 locak stack 的 pointer 和 reference, 或返回指向 heal-allocated 的 reference.
 
 ## 条款二十二
 
-所有数据成员必须统统声明为 private, 一来客户不必琢磨要不要用函数调用符，二来压倒性的封装。此外 protected 并不如 private 有封装性。
+最好把所有数据成员声明为 private, 一来客户直接调用由官方精心控制的 API, 二来封装够碾压。此外 protected 的封装性和 public 一样弱。
 
 ## 条款二十三
 
@@ -148,11 +188,27 @@ derived class 的 copying 函数要直接调用 base class 的 copying 函数。
 
 ## 条款二十四
 
-如果你需要为某函数的所有参数都能进行隐式转换，那么得定义为 non-menber 函数，特别是二元运算符。此外，member 的反面不应该全是 friend.
+如果需要某函数的所有参数都能进行隐式转换，那么得定义为 non-menber 函数，特别是二元运算符。此外，member 的反面不应该全是 friend.
+
+## 条款二十五
+
+copy and swap.
 
 ## 条款二十六
 
-到确实要用变量时才定义，并且直接在构造的同时初始化，不要构造后再赋值。此外，在循环里面还是外面定义变量，取决于赋值与构造析构的成本比较和变量作用域。
+到确实要用变量时才定义，并且直接在构造的同时初始化，不要构造后再赋值。此外，优先在循环内构造变量，除非明确赋值成本远低于构造析构且不在乎作用域污染。
+
+## 条款二十八
+
+禁止返回指向函数内部的 handler（包括引用、指针和迭代器）。
+
+## 条款二十九
+
+异常安全有三种级别：保证数据有效的基本型，保证调用成功就是成功调用失败就当没调用过的强烈型和完全不抛任何异常的最终型。可以靠 copy and swap 实现强烈型，`noexcept` 实现最终型。
+
+## 条款三十
+
+一开始不考虑 inline, 直到开始优化时就把 inline 用在那个 20% 的函数上。
 
 ## 条款四十二
 
