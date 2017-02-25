@@ -52,6 +52,18 @@ TODO: http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待�
 
 有必要时可以用 try/else 代替 with; [try 可以包含 return 语句，finally 照样会在之后被执行](http://stackoverflow.com/questions/7442133/try-else-with-return-in-try-block/7442252#7442252)。
 
+善用 [all/any]*(http://treyhunner.com/2016/11/check-whether-all-items-match-a-condition-in-python/).
+
+[有待贯彻 Python 3.6 新语法糖]*(https://medium.com/the-python-corner/syntax-sugar-in-python-3-6-776178ce51f4#.mgeqydith)
+
+可以使用官方都提倡的命名缩写，比如 `import matplotlib.pyplot as plt`, `import numpy as np` 等。
+
+## 内存优化
+
+[如果有大量类对象，其 attributes 又少。可以考虑用 `__slots__` 来构造 attributes, 其访问速度快 30%, 又避免了类 dict 耗费大量内存空间的弊端。
+
+考虑用 namedtupls 代替类，其特点自然是 immutable 且无方法。](https://oded.ninja/2016/11/30/__slots__-and-namedtuples/)
+
 ## [用 __all__ 暴露接口](https://python-china.org/t/725)
 
 ## [Python: The Dictionary Playbook](http://blog.amir.rachum.com/blog/2013/01/02/python-the-dictionary-playbook/)
