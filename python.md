@@ -58,6 +58,8 @@ TODO: http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待�
 
 可以使用官方都提倡的命名缩写，比如 `import matplotlib.pyplot as plt`, `import numpy as np` 等。
 
+shebang 里的 python 必须有明确的版本后缀，除非真打算同时支持 Python 2/3.
+
 ## 内存优化
 
 [如果有大量类对象，其 attributes 又少。可以考虑用 `__slots__` 来构造 attributes, 其访问速度快 30%, 又避免了类 dict 耗费大量内存空间的弊端。
