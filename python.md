@@ -26,6 +26,9 @@ Python 2 必须同时定义 `__eq__` 和 `__ne__` 方法，Python 3 则只定义
 
 ## 其他
 
+比起 `import foo.bar as bar`, 优先用 `from foo import bar`, 毕竟前者不能导入非 package 或 module, 后者还少几个字，按奥卡母剃刀，优先选后者。
+
+
 始终要对字符串是否包含换行符而胸有成竹。凡 identifier 是 `line`, 就必有回车符；分拆 line 或打印或 log 时，就要 `rstrip('\n')`; 同理，用 `format` 构造 `line` 时，就要在尾部显示加上回车符，除非最有一个参数是 `line`.
 
 TODO: 有待规范 Python 中异常与 option 之间的关系。
