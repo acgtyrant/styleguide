@@ -26,6 +26,8 @@ Python 2 必须同时定义 `__eq__` 和 `__ne__` 方法，Python 3 则只定义
 
 ## 其他
 
+不用 `==` 比较不同类型的值，但 `is` 可以。
+
 比起 `import foo.bar as bar`, 优先用 `from foo import bar`, 毕竟前者不能导入非 package 或 module, 后者还少几个字，按奥卡母剃刀，优先选后者。
 
 
