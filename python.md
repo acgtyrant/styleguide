@@ -1,5 +1,7 @@
 ## 库
 
+Numpy 里，[尽量避免会导致复制的函数](http://ipython-books.github.io/featured-01/)：对新变量赋运算结果的值（可以用 inplace 运算代替）；`T`；`flattern`（可以用 `ravel` 代替），fancy indexing（用 array view 或 `take` 或 `compress` 代替）。
+
 用 `subprocess.call` 代替 `os.system` 执行外部命令。
 
 [用 `pathlib` 解析 Path](http://tech.acgtyrant.com/御用-Path-规范/), 除非要用 `os.path` 解析 str 对象。
