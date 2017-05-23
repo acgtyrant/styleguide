@@ -67,6 +67,12 @@ TODO: http://nvie.com/posts/writing-a-cli-in-python-in-under-60-seconds/ 有待�
 
 shebang 里的 python 必须有明确的版本后缀，除非真打算同时支持 Python 2/3.
 
+可以用 `# noqa: F401` 之类的注释去除 flake8 的错误提醒。
+
+用 `if __debug__:` 来穿插 debug 代码块，Python 解释器可以用 `-O` 优化掉这些代码。
+
+无视 PEP 8 关于 docstring 的格式。所有 docstrings 的 `"""` 均独立成行。
+
 ## 内存优化
 
 [如果有大量类对象，其 attributes 又少。可以考虑用 `__slots__` 来构造 attributes, 其访问速度快 30%, 又避免了类 dict 耗费大量内存空间的弊端。
